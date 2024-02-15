@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AgregarNodoModal from './AgregarNodoModal';
 import AgregarRutaModal from './AgregarRutaModal';
 import Persona from './Persona';
+import AlertComponent from './AlertComponent';
 
 const MenuBar = () => {
     const [showAgregarNodoModal, setShowAgregarNodoModal] = useState(false);
@@ -35,6 +36,7 @@ const MenuBar = () => {
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <AlertComponent/>
             <div className="container">
                 <a className="navbar-brand" href="#">
                     <img src="https://joinforwater.ngo/wp-content/uploads/2022/05/logo-unl-HC-01-e1651758359420.png" alt="Logo" height="90" />
