@@ -17,22 +17,21 @@ const MenuBar = () => {
     const handleCloseAgregarRutaModal = () => setShowAgregarRutaModal(false);
     const handleShowAgregarRutaModal = () => setShowAgregarRutaModal(true);
 
-   
-
     const history = useNavigate();
 
     const handleGestionarUsuarioClick = () => {
         history('/persona');
-      };
-      const handleGestionarNodoClick = () => {
+    };
+    const handleGestionarNodoClick = () => {
         history('/nodo');
-      };
-      const handleMapaClick = () => {
+    };
+    const handleMapaClick = () => {
         history('/map');
-      };
+    };
 
-    
-    
+    const handleModificarPlanEmergenciaClick = () => {
+        window.open('https://drive.google.com/drive/folders/1ZXYLhbc-Mjte8jFfV5RYAWP5UczolTXG?usp=sharing', '_blank');
+    };
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -63,6 +62,9 @@ const MenuBar = () => {
                     </button>
                     <button className="nav-link btn btn-outline-primary mx-2" onClick={handleMapaClick}>
                         Mapa
+                    </button>
+                    <button className="nav-link btn btn-outline-primary mx-2" onClick={handleModificarPlanEmergenciaClick}>
+                        Plan de Emergencia
                     </button>
                 </div>
             </div>
