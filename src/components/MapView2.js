@@ -18,7 +18,10 @@ const MapView2 = () => {
 
     console.log(location);
     return (
-       
+            <div> 
+                <div><MenuBar></MenuBar></div>
+
+            
             <div> <MapContainer center={state.currenlocation} zoom={state.zoom}>
              
              console.log("En el retun"+location())
@@ -29,7 +32,7 @@ const MapView2 = () => {
              <Markers places={places}/>
          </MapContainer></div>
        
-       
+         </div>
         
     );
 }

@@ -49,7 +49,7 @@ function AlertComponent() {
       const notification = new Notification(`Alerta - Se detectó un sismo de: ${intensidad}`, { body: message });
       
       notification.onclick = () => {
-        window.open('http://localhost:3000/', '_blank'); // Open in a new tab
+        window.open('http://localhost:3000/map', '_blank'); // Open in a new tab
         // Alternatively, if you want to redirect in the same tab:
         // window.location.href = 'http://localhost:3000/';
       };

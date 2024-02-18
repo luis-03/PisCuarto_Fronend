@@ -5,68 +5,95 @@ const AgregarRutaModal = ({ show, handleClose, onConnectNodes }) => {
     const [nodos, setNodos] = useState([]);
     const [selectedNodeOrigen, setSelectedNodeOrigen] = useState(null);
     const [selectedNodeDestino, setSelectedNodeDestino] = useState(null);
-    const [nodosDestino, setNodosDestino] = useState([]); // Lista de nodos de destino
+    const [nodosDestino, setNodosDestino] = useState([]);
+    const [loadingNodosDestino, setLoadingNodosDestino] = useState(false);
 
     useEffect(() => {
-        // Cargar nodos desde la API al montar el componente
-        fetch('http://localhost:8095/api/v1/nodos')
-            .then((response) => response.json())
-            .then((data) => {
+        const fetchNodos = async () => {
+            try {
+                const response = await fetch('http://localhost:8095/api/v1/nodos');
+                const data = await response.json();
                 if (data && data.data) {
                     setNodos(data.data);
                 }
-            })
-            .catch((error) => console.error('Error al cargar nodos:', error));
+            } catch (error) {
+                console.error('Error al cargar nodos:', error);
+            }
+        };
+
+        fetchNodos();
     }, []);
 
-    const handleNodeOrigenSelection = (event) => {
+    const fetchNodosDestino = async (selectedNodeId) => {
+        setLoadingNodosDestino(true);
+        try {
+            const response = await fetch(`http://localhost:8095/api/v1/nodos-cercanos/${selectedNodeId}`);
+            const data = await response.json();
+            if (data) {
+                setNodosDestino(data);
+            }
+        } catch (error) {
+            console.error('Error al cargar nodos de destino:', error);
+        } finally {
+            setLoadingNodosDestino(false);
+        }
+    };
+
+    const handleNodeOrigenSelection = async (event) => {
         const selectedNodeId = event.target.value;
         const node = nodos.find((nodo) => nodo.external_registro === selectedNodeId);
         setSelectedNodeOrigen(node);
         setSelectedNodeDestino(null);
-
-        
-
-        // Llamar a la API para obtener la lista de nodos de destino basada en el nodo origen seleccionado
-        fetch(`http://localhost:8095/api/v1/nodos-cercanos/${selectedNodeId}`)
-            .then((response) => response.json())
-            .then((data) => {
-                if (data && data.data) {
-                    setNodosDestino(data.data);
-                   
-                }
-            })
-            .catch((error) => console.error('Error al cargar nodos de destino:', error));
+        await fetchNodosDestino(selectedNodeId);
     };
 
-    const handleNodeDestinoSelection = (event) => {
+    const handleNodeDestinoSelection = async (event) => {
         const selectedNodeId = event.target.value;
-        const node = nodosDestino.find((nodo) => nodo.external_registro === selectedNodeId);
-        setSelectedNodeDestino(node);
+        const node = nodosDestino.find((nodo) => nodo.external_id === selectedNodeId);
+        
+        if (node) {
+            console.log(node);
+            setSelectedNodeDestino(node);
+        } else {
+            // Aquí puedes manejar el caso cuando no se encuentra el nodo
+            console.error("No se encontró el nodo de destino correspondiente.");
+        }
     };
 
-    const handleConnectNodes = () => {
+    const handleConnectNodes = async () => {
+        console.log(selectedNodeOrigen+" "+selectedNodeDestino);
         if (selectedNodeOrigen && selectedNodeDestino) {
             const origenExternalId = selectedNodeOrigen.external_registro;
-            const destinoExternalId = selectedNodeDestino.external_registro;
+            const destinoExternalId = selectedNodeDestino.external_id;
 
-            // Realizar la llamada POST para conectar nodos
-            fetch(`http://localhost:8095/api/v1/nodos/conectar/${origenExternalId}/${destinoExternalId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then(response => response.json())
-                .then(data => {
+            try {
+                // Verificar si los nodos están cargados
+                if (!nodos.length || !nodosDestino.length) {
+                    console.error('Los nodos no están completamente cargados.');
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:8095/api/v1/nodos/conectar/${origenExternalId}/${destinoExternalId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
                     console.log('Conexión exitosa:', data);
                     onConnectNodes(origenExternalId, destinoExternalId);
-                    handleClose(); // Cerrar el modal después de conectar los nodos
-
-                    // Redireccionar a la página actual (puedes cambiar 'window.location' según tu enrutamiento)
-                    window.location.reload(); // Recargar la página actual
-                })
-                .catch(error => console.error('Error al conectar nodos:', error));
+                    handleClose();
+                    window.location.reload();
+                } else {
+                    console.error('Error al conectar nodos:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error al conectar nodos:', error);
+            }
+        } else {
+            console.log("No Entra aquí");
         }
     };
 
@@ -80,10 +107,10 @@ const AgregarRutaModal = ({ show, handleClose, onConnectNodes }) => {
                     <Form.Group controlId="formNodoOrigen">
                         <Form.Label>Nodo de Origen:</Form.Label>
                         <Form.Control as="select" onChange={handleNodeOrigenSelection}>
-                            <option value="">Selecciona un nodo</option>
+                            <option key="" value="">Selecciona un nodo</option>
                             {nodos.map((nodo) => (
                                 <option key={nodo.external_registro} value={nodo.external_registro}>
-                                    {nodo.nombre + " "+ nodo.latitud + " "+nodo.longitud}
+                                    {nodo.nombre} - {nodo.descripcion} {nodo.latitud} {nodo.longitud} 
                                 </option>
                             ))}
                         </Form.Control>
@@ -94,12 +121,13 @@ const AgregarRutaModal = ({ show, handleClose, onConnectNodes }) => {
                         <Form.Control
                             as="select"
                             onChange={handleNodeDestinoSelection}
-                            disabled={!selectedNodeOrigen}
+                            disabled={!selectedNodeOrigen || loadingNodosDestino}
                         >
-                            <option value="">Selecciona un nodo</option>
+                            <option key="" value="">Selecciona un nodo</option>
                             {nodosDestino.map((nodo) => (
-                                <option key={nodo.external_registro} value={nodo.external_registro}>
-                                    {nodo.nombre}
+                                <option key={nodo.external_id} value={nodo.external_id}>
+                                    {console.log("tipo de nodo"+nodo.descripcion)}
+                                    {nodo.nombre} - {nodo.descripcion} {nodo.latitud} {nodo.longitud}
                                 </option>
                             ))}
                         </Form.Control>
@@ -110,7 +138,11 @@ const AgregarRutaModal = ({ show, handleClose, onConnectNodes }) => {
                 <Button variant="secondary" onClick={handleClose}>
                     Cerrar
                 </Button>
-                <Button variant="primary" onClick={handleConnectNodes}>
+                <Button 
+                    variant="primary" 
+                    onClick={handleConnectNodes} 
+                  
+                >
                     Conectar Nodos
                 </Button>
             </Modal.Footer>

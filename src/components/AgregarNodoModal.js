@@ -230,7 +230,6 @@ const AgregarNodoModal = ({ show, handleClose }) => {
             </Modal.Footer>
         </Modal>
     );
-
 };
 
 export default AgregarNodoModal;

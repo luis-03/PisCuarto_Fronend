@@ -1,5 +1,4 @@
 // EditarUsuarioModal.js
-
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
@@ -15,20 +14,26 @@ const EditarUsuarioModal = ({ show, handleClose, identificacion }) => {
     Rol: '',
   });
 
-  const roles = ['Docente', 'Administrativo', 'Estudiante', 'Brigadista'];
+  const roles = ['Administrador','Brigadista'];
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Aquí realizamos la solicitud al backend para obtener los datos del usuario por su identificación
-    fetch(`http://localhost:8095/api/v1/personas/obtener/identificacion/${identificacion}`)
-      .then(response => response.json())
-      .then(data => {
-        // Actualizamos el estado con los datos del usuario recibidos del backend
+    const fetchUsuario = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8095/api/v1/personas/obtener/identificacion/${identificacion}`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+          },
+        });
+        const data = await response.json();
         setDatosUsuario(data.data);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error al obtener datos del usuario:', error);
-      });
+      }
+    };
+
+    fetchUsuario();
   }, [identificacion]);
 
   const handleInputChange = (event) => {
@@ -42,10 +47,12 @@ const EditarUsuarioModal = ({ show, handleClose, identificacion }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:8095/api/v1/personas/editar/${datosUsuario.External}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
         },
         body: JSON.stringify({
           tipo_persona: datosUsuario.Rol,

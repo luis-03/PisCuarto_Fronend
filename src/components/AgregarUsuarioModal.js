@@ -13,7 +13,7 @@ const AgregarUsuarioModal = ({ show, handleClose }) => {
         clave: '',
     });
 
-    const roles = ['Desarrollador', 'Administrador', 'Estudiante', 'Brigadista'];
+    const roles = ['Administrador', 'Brigadista'];
     const [error, setError] = useState('');
 
     const handleInputChange = (event) => {

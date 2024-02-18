@@ -32,14 +32,13 @@ const Login = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // Si la respuesta es exitosa, se muestra un mensaje de inicio de sesión exitoso
-                console.log('Inicio de sesión exitoso:', data);
-                // También podrías almacenar el token de sesión en el almacenamiento local o en una cookie
+                // Si la respuesta es exitosa, se guarda el token y el rol en el almacenamiento local
+                localStorage.setItem('token', data.data.token);
+                localStorage.setItem('rol', data.data.rol); // Almacena el rol del usuario
                 // Redirige al usuario a la página de mapas (/map) después del inicio de sesión exitoso
                 navigate('/map');
             } else {
                 // Si la respuesta contiene un error, se muestra el mensaje de error
-                console.error('Error al iniciar sesión:', data);
                 setError(data.msg);
             }
         } catch (error) {

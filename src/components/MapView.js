@@ -106,7 +106,7 @@ const MapView = () => {
                         >
                             <Popup>
                                 <div>
-                                    <p>{nodo.info.nombre}</p>
+                                    <p>{nodo.info.nombre +" - "+ nodo.info.descripcion }</p>
                                     <p>{nodo.info.latitud+" " +nodo.info.longitud}</p>
                                     <p>{}</p>
                                     <p>{nodo.info.tipoDeNodo === 'zona_en_riesgo' ? 'Zona en riesgo' : 'Zona segura'}</p>
