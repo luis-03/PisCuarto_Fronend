@@ -57,6 +57,7 @@ const MenuBar = () => {
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            
             <div className="container">
                 <a className="navbar-brand" href="#">
                     <img src="https://joinforwater.ngo/wp-content/uploads/2022/05/logo-unl-HC-01-e1651758359420.png" alt="Logo" height="90" />
@@ -64,9 +65,9 @@ const MenuBar = () => {
                 <a className="navbar-brand d-flex align-items-center" href="#">
                     <h5 className="mb-0">Ruta de evacuación</h5>
                 </a>
-                {token && (
+                
                     <AlertComponent/>
-                )}
+                
                 {token && (rol === 'administrador' || rol === 'brigadista') && (
                     <>
                         <button className="nav-link btn btn-outline-primary mx-2" onClick={handleShowAgregarNodoModal}>
